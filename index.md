@@ -147,118 +147,120 @@ ML操作步驟概覽
 
 語法
 ---
-    # 各種 import 寫法
-    import os
-    import numpy as np
-    import matplotlib.pyplot as plt
-    
-    
-    # 讓繪圖正常顯示
-    %matplotlib inline
-    
-    
-    # 讀檔的寫法
-    with open(‘example.txt’, ‘r’) as f:
-        data = f.readlines()
-    
-    import json
-    with open(‘example.json’, ‘r’) as f:
-        data = json.load(f)
-    
-    import scipy.io as sio
-    data = sio.loadmat(‘example.mat’)
-    
-    import numpy as np
-    arr = np.load(example.npy)
-    
-    import pickle
-    with open(‘example.pkl’, ‘rb’) as f:
-        arr = pickle.load(f)
-
-    import os
-    file = os.path.join('./data/', 'application_train.csv')
-    df = pd.read_csv(file)
-    
-
-    # 查看資料長相的幾種方式
-    df.head(3)
-    df.tail(3)
-    df.shape
-    df.size()
-    df.describe()
-    df['col'].value_counts()
-    df['col'].unique()
+```python=
+# 各種 import 寫法
+import os
+import numpy as np
+import matplotlib.pyplot as plt
 
 
-    # 統計
-    np.median(value_array)
-    np.quantile(value_arrar, q = …)
-    scipy.stats.mode(value_array)
-    np.mean(value_array)
+# 讓繪圖正常顯示
+%matplotlib inline
 
 
-    ⽤ pd.DataFrame 來創建⼀個 dataframe
-    ⽤ np.random.randint 來產⽣隨機數值
-    
-        
-    # df各種操作
-    pd.melt(df)
-    pd.pivot(columns='var',values='val')
-    pd.concat([df1,df2])
-    pd.concat([df1,df2],axis=1)
-    pd.merge(df1,df2,on='id',how='outer')
-    pd.merge(df1,df2,on='id',how='inner')
-    
-    subdf=df[df.id==20 | df.age!=3]  #邏輯運算子 & | ~ ^
-    subdf=df[df.column.isin(value)]
-    subdf=df[pd.isnull(obj)]
-    subdf=df[pd.notnull(obj)]
-    subdf=df.drop_duplicates()
-    subdf=df.head(3)
-    subdf=df.tail(3)
-    subdf=df.sample(frac=0.5)
-    subdf=df.sample(n=3)
-    subdf=df.iloc[n:m]
-    
-    newdf=df['id','age']
-    newdf=df.age
-    newdf=df.filter(regex=...)
-    df['col'].replace({365243: np.nan}, inplace = True)
-    
-    subdf=df.groupby(['id','age'])
-    subdf['amount'].mean()
-    subdf['amount'].apply()
-    subdf['amount'].hist()
-    subdf.mean()
-    
-    
-    # 繪圖
-    plt.style.use('default')
-    plt.style.use('ggplot')
-    plt.style.use('seaborn')
-    
-    plt.hist(df['age'], edgecolor = 'k', bins = 25)
-    sns.kdeplot(app_train.loc[app_train['TARGET'] == 0, 'DAYS_BIRTH'] / 365, label = 'target == 0')
-    sns.kdeplot(app_train.loc[app_train['TARGET'] == 1, 'DAYS_BIRTH'] / 365, label = 'target == 1', kernel='cos')
-    sns.distplot(app_train.loc[app_train['TARGET'] == 1, 'DAYS_BIRTH'] / 365, label = 'target == 1')
-    sns.barplot(px, py)
-    plt.legend()
-    
-    plt.xticks(rotation = 75); plt.title('Age of Client'); plt.xlabel('Age (years)'); plt.ylabel('Count');
-    plt.figure(figsize = (10, 8))
-    
-    
-    # 分組
-    np.linspace(20, 70, 11) #從20到70，切成10組
-    pd.cut(df['age'],bins=[10,20,30]) #(0, 10]:'(' 表示不包含, ']' 表示包含
-    pd.cut(df['age'],4)
-    pd.qcut(df['age'],4)
-    
-    
-    # 類別轉數值
-    from sklearn.preprocessing import LabelEncoder
-    le = LabelEncoder()
-    app_train[col] = le.fit_transform(app_train[col])
-        
+# 讀檔的寫法
+with open(‘example.txt’, ‘r’) as f:
+    data = f.readlines()
+
+import json
+with open(‘example.json’, ‘r’) as f:
+    data = json.load(f)
+
+import scipy.io as sio
+data = sio.loadmat(‘example.mat’)
+
+import numpy as np
+arr = np.load(example.npy)
+
+import pickle
+with open(‘example.pkl’, ‘rb’) as f:
+    arr = pickle.load(f)
+
+import os
+file = os.path.join('./data/', 'application_train.csv')
+df = pd.read_csv(file)
+
+
+# 查看資料長相的幾種方式
+df.head(3)
+df.tail(3)
+df.shape
+df.size()
+df.describe()
+df['col'].value_counts()
+df['col'].unique()
+
+
+# 統計
+np.median(value_array)
+np.quantile(value_arrar, q = …)
+scipy.stats.mode(value_array)
+np.mean(value_array)
+
+
+⽤ pd.DataFrame 來創建⼀個 dataframe
+⽤ np.random.randint 來產⽣隨機數值
+
+
+# df各種操作
+pd.melt(df)
+pd.pivot(columns='var',values='val')
+pd.concat([df1,df2])
+pd.concat([df1,df2],axis=1)
+pd.merge(df1,df2,on='id',how='outer')
+pd.merge(df1,df2,on='id',how='inner')
+
+subdf=df[df.id==20 | df.age!=3]  #邏輯運算子 & | ~ ^
+subdf=df[df.column.isin(value)]
+subdf=df[pd.isnull(obj)]
+subdf=df[pd.notnull(obj)]
+subdf=df.drop_duplicates()
+subdf=df.head(3)
+subdf=df.tail(3)
+subdf=df.sample(frac=0.5)
+subdf=df.sample(n=3)
+subdf=df.iloc[n:m]
+
+newdf=df['id','age']
+newdf=df.age
+newdf=df.filter(regex=...)
+df['col'].replace({365243: np.nan}, inplace = True)
+
+subdf=df.groupby(['id','age'])
+subdf['amount'].mean()
+subdf['amount'].apply()
+subdf['amount'].hist()
+subdf.mean()
+
+
+# 繪圖
+plt.style.use('default')
+plt.style.use('ggplot')
+plt.style.use('seaborn')
+
+plt.hist(df['age'], edgecolor = 'k', bins = 25)
+sns.kdeplot(app_train.loc[app_train['TARGET'] == 0, 'DAYS_BIRTH'] / 365, label = 'target == 0')
+sns.kdeplot(app_train.loc[app_train['TARGET'] == 1, 'DAYS_BIRTH'] / 365, label = 'target == 1', kernel='cos')
+sns.distplot(app_train.loc[app_train['TARGET'] == 1, 'DAYS_BIRTH'] / 365, label = 'target == 1')
+sns.barplot(px, py)
+plt.legend()
+
+plt.xticks(rotation = 75); plt.title('Age of Client'); plt.xlabel('Age (years)'); plt.ylabel('Count');
+plt.figure(figsize = (10, 8))
+
+
+# 分組
+np.linspace(20, 70, 11) #從20到70，切成10組
+pd.cut(df['age'],bins=[10,20,30]) #(0, 10]:'(' 表示不包含, ']' 表示包含
+pd.cut(df['age'],4)
+pd.qcut(df['age'],4)
+
+
+# 類別轉數值
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+app_train[col] = le.fit_transform(app_train[col])
+
+```
 
 ###### tags: `ML` `機器學習`
