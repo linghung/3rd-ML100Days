@@ -48,7 +48,7 @@ ML操作步驟概覽
         - 了解該數值會離群的可能原因, 以免刪除掉重要資訊
         - 解決方法
             - 新增欄位⽤以紀錄異常與否
-            - 填補(取代)：以中位數, Min, Max, Max+1 或平均數填補(有時會⽤ NA)
+            - 填補(取代)：以 mean, median, min, max, quantile, na
             - 或整欄資料不使用
     - 特徵縮放(有時不適合)(以合理的⽅式, 平衡特徵間的影響⼒)
         - 影響
@@ -97,6 +97,11 @@ ML操作步驟概覽
             - 四分位差 Quartiles
             - 變異數 Variance
             - 標準差 Standard deviation
+    - 常見於迴歸問題的評估指標
+        - 平均絕對誤差 - Mean Absolute Error (MAE)
+        - 平均平方誤差(均方差) - Mean Squared Error (MSE)
+    - 常見於分類問題的指標
+        - Binary Cross Entropy (CE)
     - 調整分析方向
 - 定義⽬標與評估準則
     - 回歸問題？分類問題？
@@ -135,8 +140,12 @@ ML操作步驟概覽
     - int64：可表⽰離散或連續變數
     - object：包含字串, ⽤於表⽰類別型變數
 - 字串/類別轉數值方式
-    - Label encoding：使⽤時機是資料為有序的
-    - One Hot encoding：使⽤時機是資料為無序的
+    - Label encoding：
+        - 使⽤時機是資料為有序的
+        - 把每個類別 mapping 到某個整數, 不會增加新欄位
+    - One Hot encoding：
+        - 使⽤時機是資料為無序的
+        - 為每個類別新增一個欄位, 用 0/1 表示是否
 - 數值型轉換方式
     - 函數：y=x*200
     - 條件式：>5給2點, <5給1點
@@ -149,88 +158,325 @@ ML操作步驟概覽
 ---
 ```python=
 # 各種 import 寫法
-import os
-import numpy as np
+import copy
+import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
+import os
+import pandas as pd
+import seaborn as sns
+import time
+from collections import defaultdict
+from PIL import Image
+from scipy.stats import mode
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, LabelEncoder
 
 
 # 讓繪圖正常顯示
 %matplotlib inline
 
 
+# help
+?pd.read_csv
+
+
+# 單行註解
+"""
+多行註解
+"""
+
+
+# 函數
+r=sum(arr1,arr2)
+r=abs(arr)
+r=len(arr)
+def mean_absolute_error(y, yp):
+    mae = MAE = sum(abs(y - yp)) / len(y)
+    return mae
+def mean_squared_error(y, yp):
+    mse = MSE = sum((y - yp)**2) / len(y)
+    return mse
+def normalize_value(x):
+    x = 2 * (((x-x.min())/(x.max()-x.min())) - 0.5)
+    return x
+
 # 讀檔的寫法
-with open(‘example.txt’, ‘r’) as f:
+import requests
+try:
+    response = requests.get(target_url)
+    data = response.text
+    data = data.split('\n')
+    arrange_data = []
+    for line in data:
+        line = line.split('\t')
+        arrange_data.append(line)
+    df = pd.DataFrame(arrange_data)
+    from PIL import Image
+    from io import BytesIO
+    first_link = df.loc[0][1]
+    response = requests.get(first_link)
+    img = Image.open(BytesIO(response.content))
+    width, height = img.size
+    img = img.resize((width*3,height))
+    img = np.array(img)
+    plt.imshow(img)
+    plt.show()
+except:
+    print("fail")
+
+with open('example.txt', 'r') as f:
     data = f.readlines()
 
 import json
-with open(‘example.json’, ‘r’) as f:
+with open('example.json', 'r') as f:
     data = json.load(f)
 
 import scipy.io as sio
-data = sio.loadmat(‘example.mat’)
+data = sio.loadmat('example.mat')
 
 import numpy as np
 arr = np.load(example.npy)
 
 import pickle
-with open(‘example.pkl’, ‘rb’) as f:
+with open('example.pkl', 'rb') as f:
     arr = pickle.load(f)
 
 import os
 file = os.path.join('./data/', 'application_train.csv')
 df = pd.read_csv(file)
 
+data = []
+with open("data/example.txt", 'r') as f:
+    for line in f:
+        line = line.replace('\n', '').split(',') # 將每句最後的 /n 取代成空值後，再以逗號斷句
+        data.append(line)
+df = pd.DataFrame(data[1:])
+df.columns = data[0]
+
+import json
+df.to_json('data/example01.json')
+with open('data/example01.json', 'r') as f:
+    j1 = json.load(f)
+df.set_index('id', inplace=True)
+df.to_json('data/example02.json', orient='index')
+with open('data/example02.json', 'r') as f:
+    j2 = json.load(f)
+    
+import numpy as np
+# 將 data 的數值部分轉成 numpy array
+array = np.array(data[1:])
+np.save(arr=array, file='data/example.npy')
+array_back = np.load('data/example.npy')
+
+import pickle
+with open('data/example.pkl', 'wb') as f:
+    pickle.dump(file=f, obj=data)
+with open('data/example.pkl', 'rb') as f:
+    pkl_data = pickle.load(f)
+
+
+# image
+import skimage.io as skio
+img1 = skio.imread('data/examples/example.jpg')
+plt.imshow(img1)
+plt.show()
+
+from PIL import Image
+img2 = Image.open('data/examples/example.jpg') # 這時候還是 PIL object
+img2 = np.array(img2)
+plt.imshow(img2)
+plt.show()
+
+import cv2
+img3 = cv2.imread('data/examples/example.jpg')
+plt.imshow(img3)
+plt.show()
+
+img3 = cv2.cvtColor(img3, cv2.COLOR_BGR2RGB)
+plt.imshow(img3)
+plt.show()
+
+%%timeit
+im = np.array([skio.imread('data/examples/example.jpg') for _ in range(N_times)])
+
+import scipy.io as sio
+sio.savemat(file_name='data/examples/example.mat', mdict={'img': img1})
+
+mat_arr = sio.loadmat('data/examples/example.mat')
+print(mat_arr.keys())
+
+mat_arr = mat_arr['img']
+print(mat_arr.shape)
+
+plt.imshow(mat_arr)
+plt.show()
+
 
 # 查看資料長相的幾種方式
 df.head(3)
 df.tail(3)
 df.shape
-df.size()
-df.describe()
-df['col'].value_counts()
-df['col'].unique()
+df.shape[0]
+df.index
+df.size
+df['a'].values
+df['a'].value_counts()
+df['a'].unique()
+train_num = train_Y.shape[0]
+len(df)
+df.dtypes
+df.dtypes.value_counts()
+df['a'].value_counts().sort_index(ascending = False)
+l=df.columns.tolist()
+c=df.select_dtypes('number').columns
+df.select_dtypes(include=["object"]).apply(pd.Series.nunique, axis = 0)
+
+# 資料欄位的類型與數量
+dtype_df = df.dtypes.reset_index() 
+dtype_df.columns = ["Count", "Column Type"]
+dtype_df = dtype_df.groupby("Column Type").aggregate('count').reset_index()
 
 
-# 統計
+# 計算
 np.median(value_array)
+np.median(app_train[~app_train['AMT_ANNUITY'].isnull()]['AMT_ANNUITY'])
 np.quantile(value_arrar, q = …)
 scipy.stats.mode(value_array)
 np.mean(value_array)
+c=pd.corr()
+c=pd.corr()['a']
+nunique
+df.describe()
+df['a'].describe()
+x=df['a'].min()
+x=df['a'].max()
+x=df['a'].mean()
+x=df['a'].std()
+x=df['a'].nunique()
+df.sort_values('col1').max()
+zscore
+corr = np.corrcoef(sub_df['a'], sub_df['b'])
+df['a'].mean()
+df=np.log1p(df['a'])
+df=np.log(df['a'])
+
+# cdf
+series = df['a']
+li = list(series)
+li.sort()
+cdf = pd.Series(series.index+1, li)
+
+# 標準化搭配羅吉斯迴歸模型
+df_0 = df.fillna(0)
+df_temp = StandardScaler().fit_transform(df_0)
+train_X = df_temp[:train_num]
+r=cross_val_score(LogisticRegression(solver='lbfgs'), train_X, train_Y, cv=5).mean()
+
+train_X = MinMaxScaler().fit_transform(df)
+train_X = StandardScaler().fit_transform(df)
+cross_val_score(LinearRegression(), train_X, train_Y, cv=5).mean()
+cross_val_score(LogisticRegression(solver='lbfgs'), train_X, train_Y, cv=5).mean()
+
+q=[np.percentile(df[~df['a'].isnull()]['a'], q = i) for i in [0, 25, 50, 75, 100]]
+q=np.percentile(df[not_null]['a'], q=99)
+from scipy.stats import mode
+mode(df[~df['A'].isnull()]['A'])
+s=sum(app_train['DAYS_EMPLOYED'] == 365243)
 
 
-⽤ pd.DataFrame 來創建⼀個 dataframe
-⽤ np.random.randint 來產⽣隨機數值
+# 新變數
+cities = ['Austin', 'Dallas', 'Austin', 'Dallas']
+weekdays = ['Sun', 'Sun', 'Mon', 'Mon']
+visitors = [139, 237, 326, 456]
+list_labels = ['city', 'weekday', 'visitor']
+list_cols = [cities, weekdays, visitors]
+zipped = list(zip(list_labels, list_cols))
+visitors_2 = pd.DataFrame(dict(zipped))
+
+df=pd.DataFrame({'B':['B2', 'B3', 'B6', 'B7'],
+                   'D':['D2', 'D3', 'D6', 'D7'],
+                   'F':['F2', 'F3', 'F6', 'F7']},
+                   index=[2, 3, 6, 7])
+mode_dict = defaultdict(lambda:0)
+sorted(mode_dict.items(), key=lambda kv: kv[1], reverse=True)
+np.random.seed(1)
+arr=np.random.randint(100,300,size=3)
+arr=np.random.randint(0, 50, 1000)
+x=np.random.randn() #隨機傳回標準常態分布的取樣值
+arr=np.random.randn(101)
+arr=np.random.normal(0, 10, 1000)
+
+
+# 計時
+start = time.time()
+end = time.time()
+dif = end-start
+print("Elapsed time: %.3f secs" % (dif))
 
 
 # df各種操作
-pd.melt(df)
+df=pd.melt(df)
 pd.pivot(columns='var',values='val')
-pd.concat([df1,df2])
-pd.concat([df1,df2],axis=1)
-pd.merge(df1,df2,on='id',how='outer')
-pd.merge(df1,df2,on='id',how='inner')
+df=pd.concat([df1,df2,df3])
+df=pd.concat([df1,df2,df3],axis=1)
+df=pd.concat([df1,df2,df3],axis=1,join='inner')
+df=pd.merge(df1,df2,on='id',how='outer')
+df=pd.merge(df1,df2,on='id',how='inner')
+id=df['Id']
+df=df.drop(['a', 'b'], axis=1)
 
+# 把只有 2 值 (通常是 0,1) 的欄位去掉
+numeric_columns = list(app_train[numeric_columns].columns[list(app_train[numeric_columns].apply(lambda x:len(x.unique())!=2 ))])
+
+b=df['age'] != 30
+subdf=df[b]
+subdf=df[df['age'] != 30]
 subdf=df[df.id==20 | df.age!=3]  #邏輯運算子 & | ~ ^
+keep_indexs = (df['a']> 1) & (df['a']< 5)
+df = df[keep_indexs]
+subdf=df.loc[df['a'] > 3, ['b', 'c']]
 subdf=df[df.column.isin(value)]
 subdf=df[pd.isnull(obj)]
+app_train[~app_train['AMT_ANNUITY'].isnull()]['AMT_ANNUITY']
+subdf = df[df[i].notna()]
 subdf=df[pd.notnull(obj)]
+df['a'].dropna(inplace =True)
+subdf = df[:x]
+df[['a','b']]
 subdf=df.drop_duplicates()
 subdf=df.head(3)
 subdf=df.tail(3)
 subdf=df.sample(frac=0.5)
 subdf=df.sample(n=3)
 subdf=df.iloc[n:m]
+x=df.loc[0]['TARGET'] #第 0 列資料的 TARGET 欄位的值
+arr=df.loc[100] #第 100 列資料
+df=df.loc[95:100][['a','b']] #第 95 ~ 100 列的其中兩欄
+subdf=df.isnull()
+subdf=df['a'].isnull()
+df['a'] = df['a'].clip(800, 2500)
+#.sum().sort_values(ascending=False).head()
+
+#只取 int64, float64 兩種數值型欄位, 存於 num_features 中
+num_features = []
+for dtype, feature in zip(df.dtypes, df.columns):
+    if dtype == 'float64' or dtype == 'int64':
+        num_features.append(feature)
 
 newdf=df['id','age']
 newdf=df.age
 newdf=df.filter(regex=...)
 df['col'].replace({365243: np.nan}, inplace = True)
 
+subdf=df.groupby(by='a')['b','c']
 subdf=df.groupby(['id','age'])
+subdf=df.groupby(['a']).apply(lambda x: x / x.mean())
 subdf['amount'].mean()
 subdf['amount'].apply()
-subdf['amount'].hist()
 subdf.mean()
+df_m1 = df.fillna(-1)
 
 
 # 繪圖
@@ -238,29 +484,76 @@ plt.style.use('default')
 plt.style.use('ggplot')
 plt.style.use('seaborn')
 
+df['a'].plot.hist(title = 'xxx')
+df.groupby(['a'])['b'].hist()
+df.groupby(['a'])['b'].hist(bins = 100)
+plt.plot(df['a'], np.log10(df['b']), 'b.',label = 'mylabel') #散佈圖
+plt.plot(x_lin, y_hat, 'r-', label = 'line')
+df['a'].hist()
+plt.hist(app_train[~app_train.OWN_CAR_AGE.isnull()]['OWN_CAR_AGE'])
+plt.scatter(x, y) #散佈圖
 plt.hist(df['age'], edgecolor = 'k', bins = 25)
+df.boxplot(column=c, by = b, showfliers = False, figsize=(12,12))
+sns.boxplot(x=df[col])
+sns.regplot(x = df['GrLivArea'], y=train_Y)
 sns.kdeplot(app_train.loc[app_train['TARGET'] == 0, 'DAYS_BIRTH'] / 365, label = 'target == 0')
 sns.kdeplot(app_train.loc[app_train['TARGET'] == 1, 'DAYS_BIRTH'] / 365, label = 'target == 1', kernel='cos')
 sns.distplot(app_train.loc[app_train['TARGET'] == 1, 'DAYS_BIRTH'] / 365, label = 'target == 1')
 sns.barplot(px, py)
-plt.legend()
+fig, axs = plt.subplots(3, 5)
+fig.set_figwidth(15)
+fig.set_figheight(9)
+fig.subplots_adjust(wspace = 0.2, hspace = 0.3)
+p = axs[count//5, count%5]
+p.plot(sub_df[i], sub_df['TARGET'], '.')
+p.set_title(i)
+sub_df.boxplot(column=[i], by=['TARGET'], ax=p)
 
+plt.xlim([cdf.index.min(), cdf.index.max() * 1.05]) # 限制顯示圖片的範圍
+plt.ylim([-0.05,1.05]) # 限制顯示圖片的範圍
+plt.legend(loc = 2)
 plt.xticks(rotation = 75); plt.title('Age of Client'); plt.xlabel('Age (years)'); plt.ylabel('Count');
+plt.suptitle('')
 plt.figure(figsize = (10, 8))
+plt.show()
 
+
+# print
+print('The anomalies default on %0.2f%% of loans' % (100 * anom['TARGET'].mean()))
+print('There are %d anomalous days of employment' % len(anom))
+print(f'{len(x)} Numeric Features : {x}\n')
 
 # 分組
-np.linspace(20, 70, 11) #從20到70，切成10組
+arr=np.linspace(20, 70, 11) #從20到70，切成10組
 pd.cut(df['age'],bins=[10,20,30]) #(0, 10]:'(' 表示不包含, ']' 表示包含
 pd.cut(df['age'],4)
+pd.cut(df['a'], rule, include_lowest=True)
 pd.qcut(df['age'],4)
 
 
-# 類別轉數值
+# 類別轉數值 - label encoding
 from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
-app_train[col] = le.fit_transform(app_train[col])
+df[col] = le.fit_transform(df[col])
+le.fit(df[col])
+df[col] = le.transform(df[col])
+
+# 類別轉數值 - one hot encoding
+df = pd.get_dummies(df) # 原本A欄位值為x與y的話, 就會做成欄位 A_x 與 A_y
+
+
+# sort
+arr=arr.sort_values()
+
+
+
+
+
+
+
+
 
 ```
+
 
 ###### tags: `ML` `機器學習`
