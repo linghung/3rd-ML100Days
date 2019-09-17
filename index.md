@@ -166,6 +166,7 @@ import os
 import pandas as pd
 import seaborn as sns
 import time
+import warnings
 from collections import defaultdict
 from PIL import Image
 from scipy.stats import mode
@@ -176,12 +177,10 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, LabelEncoder
 
 # 讓繪圖正常顯示
 %matplotlib inline
-
-
+# 忽略警告訊息
+warnings.filterwarnings('ignore')
 # help
 ?pd.read_csv
-
-
 # 單行註解
 """
 多行註解
@@ -496,10 +495,22 @@ plt.hist(df['age'], edgecolor = 'k', bins = 25)
 df.boxplot(column=c, by = b, showfliers = False, figsize=(12,12))
 sns.boxplot(x=df[col])
 sns.regplot(x = df['GrLivArea'], y=train_Y)
-sns.kdeplot(app_train.loc[app_train['TARGET'] == 0, 'DAYS_BIRTH'] / 365, label = 'target == 0')
-sns.kdeplot(app_train.loc[app_train['TARGET'] == 1, 'DAYS_BIRTH'] / 365, label = 'target == 1', kernel='cos')
-sns.distplot(app_train.loc[app_train['TARGET'] == 1, 'DAYS_BIRTH'] / 365, label = 'target == 1')
+sns.kdeplot(df.loc[df['a'] == 0, 'b'] / 365, label = 'xxx')
+sns.kdeplot(df.loc[df['a'] == 1, 'b'] / 365, label = 'xxx', kernel='cos')
+sns.distplot(df.loc[df['a'] == 1, 'b'] / 365, label = 'xxx', hist = False)
 sns.barplot(px, py)
+
+# 先指定劃在哪格
+plt.subplot(321) # 列-欄-位置
+# 再呼叫繪製函數
+plt.plot([0,1],[0,1], label = 'I am subplot1')
+
+plt.subplot(nrows, ncols, i+1)
+plt.subplot(grid[0, 0])
+plt.subplot(grid[0, 1:])
+plt.subplot(grid[1, :2])
+plt.subplot(grid[1, 2])
+sns.jointplot()
 fig, axs = plt.subplots(3, 5)
 fig.set_figwidth(15)
 fig.set_figheight(9)
