@@ -170,6 +170,7 @@ import warnings
 from collections import defaultdict
 from PIL import Image
 from scipy.stats import mode
+from scipy.stats import zscore
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, LabelEncoder
@@ -188,8 +189,8 @@ warnings.filterwarnings('ignore')
 
 
 # 函數
-r=sum(arr1,arr2)
-r=abs(arr)
+r=sum(arr)
+r=abs(x)
 r=len(arr)
 def mean_absolute_error(y, yp):
     mae = MAE = sum(abs(y - yp)) / len(y)
@@ -320,16 +321,15 @@ df.shape
 df.shape[0]
 df.index
 df.size
+len(df)
 df['a'].values
 df['a'].value_counts()
 df['a'].unique()
-train_num = train_Y.shape[0]
-len(df)
 df.dtypes
 df.dtypes.value_counts()
 df['a'].value_counts().sort_index(ascending = False)
-l=df.columns.tolist()
-c=df.select_dtypes('number').columns
+df.columns.tolist()
+df.select_dtypes('number').columns
 df.select_dtypes(include=["object"]).apply(pd.Series.nunique, axis = 0)
 
 # 資料欄位的類型與數量
@@ -339,27 +339,25 @@ dtype_df = dtype_df.groupby("Column Type").aggregate('count').reset_index()
 
 
 # 計算
-np.median(value_array)
-np.median(app_train[~app_train['AMT_ANNUITY'].isnull()]['AMT_ANNUITY'])
-np.quantile(value_arrar, q = …)
-scipy.stats.mode(value_array)
-np.mean(value_array)
-c=pd.corr()
-c=pd.corr()['a']
-nunique
 df.describe()
 df['a'].describe()
-x=df['a'].min()
-x=df['a'].max()
-x=df['a'].mean()
-x=df['a'].std()
-x=df['a'].nunique()
-df.sort_values('col1').max()
-zscore
-corr = np.corrcoef(sub_df['a'], sub_df['b'])
+df['a'].min()
+df['a'].max()
 df['a'].mean()
-df=np.log1p(df['a'])
-df=np.log(df['a'])
+df['a'].std()
+df['a'].nunique()
+df.sort_values('a').max()
+df.corr()
+df.corr()['a']
+np.corrcoef(df['a'], df['b'])
+np.mean(arr)
+np.median(arr)
+np.median(df[~df['a'].isnull()]['a'])
+np.quantile(arr, q = [0,.5])
+np.log1p(df['a'])
+np.log(df['a'])
+mode(arr) # from scipy.stats import mode
+zscore(arr) # from scipy.stats import zscore
 
 # cdf
 series = df['a']
