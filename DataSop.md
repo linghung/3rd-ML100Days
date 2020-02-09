@@ -68,7 +68,7 @@
                     * z 轉換法：(x-mean(x))/std(x)
                     * 空間壓縮法
                         * 控制在0~1之間：(x-min(x))/(max(x)-min(x))
-                        * 控制在-1~1之間：((x-min(x))/(max(x)-min(x))-0.5)*2
+                        * 控制在-1~1之間：((x-min(x))/(max(x)-min(x))-0.5) * 2
                         * Qlow/Qhigh normalization: 上述的 min, max 改用 q1, q99
                         * 控制在0~1之間(針對特別影像): x/255
                 * MinMax Scaler 最⼩最⼤化, 適合均勻分佈, 容易受到極端值影響
