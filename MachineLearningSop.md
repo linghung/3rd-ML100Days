@@ -19,7 +19,8 @@
             * Accuracy
             * F1-score
             * AUC, Area Under Curve
-            * Area Under the ROC(Receiver Operating Curve) curve: AUROC 0.5 代表隨機猜測，1 表示預測最好
+            * AUROC, Area Under the ROC(Receiver Operating Curve)
+                * 0.5 代表隨機猜測，1 表示預測最好
             * MAP@N
 * 建立模型與調整參數
     * 模型: 
