@@ -13,12 +13,14 @@
         * 回歸問題 (預測值為實數)
             * RMSE, Root Mean Square Error
             * Mean Absolute Error
+            * Mean Squared Error
             * R-Square
         * 分類問題 (預測值為類別)
             * Accuracy
             * F1-score
             * AUC, Area Under Curve
-            * Area Under the ROC curve: AUROC 0.5 代表隨機猜測，1 表示預測最好
+            * Area Under the ROC(Receiver Operating Curve) curve: AUROC 0.5 代表隨機猜測，1 表示預測最好
+            * MAP@N
 * 建立模型與調整參數
     * 模型: 
         * Regression 回歸模型
